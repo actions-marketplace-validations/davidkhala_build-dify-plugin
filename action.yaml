@@ -4,28 +4,36 @@ description: ''
 branding:
   icon: 'package' # find one in https://haya14busa.github.io/github-action-brandings/
   color: 'purple' # one of ["white", "yellow", "blue", "green", "orange", "red", "purple", "gray-dark"]
+inputs:
+  pyproject-directory:
+    description: 'dir of pyproject.toml'
+    required: true
 runs:
   using: "composite"
   steps:
   
   - if: runner.os == 'Linux'
     run: |
+      echo "repo=$(basename $GITHUB_WORKSPACE)" >> $GITHUB_ENV
       LATEST_RELEASE=$(curl -s https://api.github.com/repos/langgenius/dify-plugin-daemon/releases/latest)
       DOWNLOAD_URL=$(echo $LATEST_RELEASE | jq -r '.assets[] | select(.name | contains("dify-plugin-linux-amd64")) | .browser_download_url' | head -1)
-      curl -L -o ../dify $DOWNLOAD_URL
-      chmod +x ../dify
-      ../dify version
+      curl -L -o $GITHUB_WORKSPACE/dify $DOWNLOAD_URL
+      chmod +x $GITHUB_WORKSPACE/dify
+      $GITHUB_WORKSPACE/dify version
     shell: bash
   - if: runner.os == 'macOS'
-    run: | 
+    run: |
+      echo "repo=$(basename $GITHUB_WORKSPACE)" >> $GITHUB_ENV
       LATEST_RELEASE=$(curl -s https://api.github.com/repos/langgenius/dify-plugin-daemon/releases/latest)
       DOWNLOAD_URL=$(echo $LATEST_RELEASE | jq -r '.assets[] | select(.name | contains("dify-plugin-darwin-arm64")) | .browser_download_url' | head -1)
-      curl -L -o ../dify $DOWNLOAD_URL
-      chmod +x ../dify
-      ../dify version
+      curl -L -o $GITHUB_WORKSPACE/dify $DOWNLOAD_URL
+      chmod +x $GITHUB_WORKSPACE/dify
+      $GITHUB_WORKSPACE/dify version
     shell: bash
   - if: runner.os == 'Windows'
     run: |
+      $repo = Split-Path $env:GITHUB_WORKSPACE -Leaf
+      "repo=$repo" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
       $latest = Invoke-RestMethod https://api.github.com/repos/langgenius/dify-plugin-daemon/releases/latest
       $url = $latest.assets | Where-Object { $_.name -like "*dify-plugin-windows-amd64.exe*" } | Select-Object -First 1 | ForEach-Object { $_.browser_download_url }
       Invoke-WebRequest -Uri $url -OutFile "$env:GITHUB_WORKSPACE\dify.exe"
