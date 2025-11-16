@@ -3,7 +3,7 @@ description: ''
 
 branding:
   icon: 'package' # find one in https://haya14busa.github.io/github-action-brandings/
-  color: 'purple' # one of ["white", "yellow", "blue", "green", "orange", "red", "purple", "gray-dark"]
+  color: 'blue'
 inputs:
   pyproject-directory:
     description: 'dir of pyproject.toml'
@@ -11,7 +11,6 @@ inputs:
 runs:
   using: "composite"
   steps:
-  
   - if: runner.os == 'Linux'
     run: |
       echo "repo=$(basename $GITHUB_WORKSPACE)" >> $GITHUB_ENV
@@ -39,3 +38,11 @@ runs:
       Invoke-WebRequest -Uri $url -OutFile "$env:GITHUB_WORKSPACE\dify.exe"
       & "$env:GITHUB_WORKSPACE\dify.exe" version
     shell: pwsh
+  - if: runner.os == 'Linux'
+    name: Build Dify plugin package
+    working-directory: ${{ inputs.pyproject-directory }}
+    run: |
+      cd ../
+      $GITHUB_WORKSPACE/dify plugin package $repo
+      mv "$repo.difypkg" "${GITHUB_WORKSPACE}/$repo.difypkg"
+    shell: bash
