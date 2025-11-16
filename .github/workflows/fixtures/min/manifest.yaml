@@ -1,4 +1,4 @@
-version: 0.0.0
+version: 0.0.0 # plugin version
 name: minimum plugin
 type: plugin
 author: davidkhala
@@ -11,7 +11,7 @@ resource:
   memory: 1
 icon: icon.svg
 meta:
-  version: 0.0.0
+  version: 0.0.0 # 标识 manifest 文件的格式版本
   arch:
   - amd64
   - arm64

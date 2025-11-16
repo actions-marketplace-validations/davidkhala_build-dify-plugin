@@ -1,2 +1,1 @@
-# action-template
-Github Action template
+# davidkhala/build-dify-plugin
